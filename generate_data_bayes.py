@@ -2,7 +2,7 @@ from sklearn.utils import check_random_state
 import numpy as np
 
 
-def generate_data(n_samples, r1, r2, sigma, random_state=None):
+def generate_data(n_samples, r1, r2, sigma, random_state=0):
     random_state = check_random_state(random_state)
 
     y = random_state.randint(0, 2, size=n_samples)
