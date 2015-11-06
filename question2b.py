@@ -5,15 +5,12 @@ Created on Fri Nov  6 14:07:50 2015
 """
 
 import numpy as np
-from sklearn.utils import check_random_state
+from utils import get_random_state
 
-random_state = 0
-random_state = check_random_state(random_state) 
-
-
+random_state = get_random_state()
 
 def make_data(n_samples):
-    
+
     x = np.zeros((n_samples,1))
     noise = np.zeros((n_samples,1))
     y = np.zeros((n_samples,1))
@@ -27,9 +24,10 @@ def make_data(n_samples):
         y[i] = bayes[i] + noise[i]
         
     return y,x,bayes
-        
+
+
 def bayes_model():
-    
+
     x = np.zeros((n_samples,1))
     bayes = np.zeros((n_samples,1))    
     
@@ -41,8 +39,9 @@ def bayes_model():
 
 
 
-n_samples = 2000
+if __name__ == "__main__":
 
+    n_samples = 2000
 
-y,x,bayes = make_data(n_samples)
+    y,x,bayes = make_data(n_samples)
 
