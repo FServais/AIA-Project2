@@ -13,10 +13,6 @@ from sklearn.neighbors import KNeighborsRegressor
 random_state = get_random_state()
 
 
-def var(l):
-    return np.var(l)
-
-
 def make_data(x, n_samples=1):
 
     y = np.zeros(n_samples)
@@ -82,4 +78,6 @@ if __name__ == "__main__":
         y[i] = make_data(x[i])
 
     for i in range(len(x0)):
+        
+        
     
