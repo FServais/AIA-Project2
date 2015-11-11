@@ -81,5 +81,4 @@ if __name__ == "__main__":
         x[i] = random_state.uniform(low=-9.0, high=9.0)
         y[i] = make_data(x[i])
 
-    for i in range(len(x0)):
-    
+
