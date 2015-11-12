@@ -9,6 +9,7 @@ from matplotlib import pyplot as plt
 from utils import get_random_state
 from sklearn.linear_model import LinearRegression
 from sklearn.neighbors import KNeighborsRegressor
+from sklearn.tree import DecisionTreeRegressor
 
 
 
@@ -57,9 +58,9 @@ Output :
 '''
 def variance_bias(regressors, n_samples, x0, n_fit, noise = 1):
         
-    y_estimate = np.zeros((n_fit,2))
-    bias_squared = np.zeros((2))
-    variance = np.zeros((2))
+    y_estimate = np.zeros((n_fit,len(regressors)))
+    bias_squared = np.zeros(len(regressors))
+    variance = np.zeros(len(regressors))
     x = np.zeros((n_samples))
     y = np.zeros((n_samples))
     for n in range(n_fit):
@@ -72,10 +73,13 @@ def variance_bias(regressors, n_samples, x0, n_fit, noise = 1):
         for j in range(len(regressors)):
             regressors[j].fit(x,y)
             y_estimate[n,j] = regressors[j].predict(x0)
+            
       
-    for i in range(2):    
+    for i in range(len(regressors)):    
         bias_squared[i] = (bayes_model(x0)- np.mean(y_estimate[:,i]))**2
         variance[i] = np.var(y_estimate[:,i])
+        print bayes_model(x0)
+        print np.mean(y_estimate[:,i])
     
     return variance, bias_squared
     
@@ -116,19 +120,20 @@ def plot_var_bias_size_LS(regressors, x0,name_regression):
 
 def plot_var_bias_complexity(x0, n_samples):
     
-    n_neighbors = [1, 3, 5 , 10, 15, 25, 50, 100, 250, 500, 1000,1500, 2000]
+    n_neighbors = [1,2, 3,4, 5 ,7, 10, 15, 25]#, 1000,1500, 2000]
     
     mean_var = np.zeros(len(n_neighbors))
     mean_bias = np.zeros(len(n_neighbors))
     error = np.zeros(len(n_neighbors))    
     
     for k in range(len(n_neighbors)):
+        print 1
         knn_regressor = KNeighborsRegressor(n_neighbors[k]) 
         regressors = ([knn_regressor])
-        variance = np.zeros((len(x0),2))
-        bias_squared = np.zeros((len(x0),2))
+        variance = np.zeros(len(x0))
+        bias_squared = np.zeros(len(x0))
         for i in range(len(x0)):
-            variance[i], bias_squared[i] = variance_bias(regressors,n_samples, x0[i],250)
+            variance[i], bias_squared[i] = variance_bias(regressors,n_samples, x0[i],50)
         
     
         mean_var[k] = np.mean(variance)
@@ -146,15 +151,15 @@ def plot_var_bias_complexity(x0, n_samples):
     plt.savefig("Change of complexity.pdf")
     
 
-        
+    return variance , bias_squared,mean_var, mean_bias    
     
 
 
 
 if __name__ == "__main__":
 
-    x0 = np.linspace(-9.0, 9.0,20)
-    n_samples = 2000
+    x0 = np.linspace(-9.0,9.0,45)
+    n_samples = 500
     
     linear_regression = LinearRegression()
     knn_regressor = KNeighborsRegressor()    
@@ -173,12 +178,12 @@ if __name__ == "__main__":
     
     name_regression = ["Linear regression", "knn regression"]
     
-    '''
+     
     variance = np.zeros((len(x0),2))
     bias_squared = np.zeros((len(x0),2))
     
     for i in range(len(x0)):
-        variance[i,:], bias_squared[i,:] = variance_bias(regressors,n_samples, x0[i],500)
+        variance[i,:], bias_squared[i,:] = variance_bias(regressors,n_samples, x0[i],250)
     
     #PLOT
     pred = np.zeros((len(x0),2))
@@ -233,14 +238,14 @@ if __name__ == "__main__":
         plt.xlabel("x")
         plt.xlim((-9.0, 9.0))
         plt.savefig(name_regression[i]+" total_error.pdf")
-    ''' 
+    
     
     #QUESTION 2 D    
     
     
     #plot_var_bias_size_LS(regressors, x0, name_regression)
     
-    plot_var_bias_complexity(x0, n_samples)
+    #v, b,mean_var, mean_bias = plot_var_bias_complexity(x0, n_samples)
     
     
 
