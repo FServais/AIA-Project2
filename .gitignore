@@ -2,3 +2,10 @@
 bayes_data.png
 h.png
 __pycache__/utils.cpython-34.pyc
+knn regression squared_bias.pdf
+knn regression total_error.pdf
+knn regression variance.pdf
+Linear regression squared_bias.pdf
+Linear regression total_error.pdf
+Linear regression variance.pdf
+Residual_errors.pdf

@@ -57,7 +57,7 @@ def variance_bias(regressors, n_samples, x0, n_fit):
         regressors[0].fit(x,y)
         regressors[1].fit(x,y)
         y_estimate[i, j] = regressors[0].predict(x0)
-        j +=1
+        j += 1
         y_estimate[i, j] = regressors[1].predict(x0)
 
     for i in range(2):
@@ -69,7 +69,7 @@ def variance_bias(regressors, n_samples, x0, n_fit):
 
 if __name__ == "__main__":
 
-    x0 = np.linspace(-9.0, 9.0, 15)
+    x0 = np.linspace(-9.0, 9.0, 90)
     n_samples = 2000
 
     linear_regression = LinearRegression()
@@ -90,7 +90,7 @@ if __name__ == "__main__":
     bias_squared = np.zeros((len(x0),2))
 
     for i in range(len(x0)):
-        variance[i,:], bias_squared[i,:] = variance_bias(regressors,n_samples, x0[i],500)
+        variance[i,:], bias_squared[i,:] = variance_bias(regressors, n_samples, x0[i], 500)
     
     # PLOT
     pred = np.zeros((len(x0),2))
