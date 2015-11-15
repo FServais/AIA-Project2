@@ -260,7 +260,7 @@ if __name__ == "__main__":
 
         print("Total Error = {}".format(np.mean(bias_squared[:,i]) + np.mean(variance[:,i])))
         plt.figure()
-        plt.plot(x0, (bias_squared[:, i]+variance[:, i]))
+        plt.plot(x0, (bias_squared[:, i]+variance[:, i]+res_errors))
         plt.title(name_regression[i] + " : Total error")
         plt.xlabel("x")
         plt.xlim((-9.0, 9.0))
