@@ -131,11 +131,9 @@ def plot_var_bias_complexity(x0, n_samples):
         for i in range(len(x0)):
             variance[i], bias_squared[i] = variance_bias(regressors,n_samples, x0[i],250)
 
-
         mean_var[k] = np.mean(variance)
         mean_bias[k] = np.mean(bias_squared)
         error[k] = mean_var[k] + mean_bias[k]
-
 
     plt.figure()
     plt.plot(n_neighbors,mean_var, label="Mean variance")
@@ -143,7 +141,7 @@ def plot_var_bias_complexity(x0, n_samples):
     plt.plot(n_neighbors,error, label="Error")
     plt.title("Effect of the change of complexity")
     plt.xlabel("Number of neighbors")
-    plt.legend(loc = "lower center")
+    plt.legend(loc="lower center")
     plt.savefig("Change of complexity.pdf")
 
 
@@ -155,7 +153,7 @@ if __name__ == "__main__":
     linear_regression = LinearRegression()
     knn_regressor = KNeighborsRegressor()
 
-    regressors = ([linear_regression, knn_regressor])
+    regressors = [linear_regression, knn_regressor]
 
     # Residual
     res_errors = np.zeros(len(x0))
@@ -166,7 +164,7 @@ if __name__ == "__main__":
 
     name_regression = ["Linear regression", "knn regression"]
 
-    '''
+
     variance = np.zeros((len(x0),2))
     bias_squared = np.zeros((len(x0),2))
 
@@ -185,10 +183,10 @@ if __name__ == "__main__":
     plt.plot(x0, (np.sin(x0)+ np.cos(x0))*x0**2, linewidth = 2.0, label="Real function")
     plt.plot(x0, pred[:,0], label = "Linear prediction")
     plt.plot(x0, pred[:,1], label = "knn prediction")
-    plt.title( "Prediction against real function")
+    plt.title("Prediction against real function")
 
     plt.xlabel("x")
-    plt.legend(loc = "upper center")
+    plt.legend(loc="upper center")
     plt.xlim((-9.0, 9.0))
     plt.savefig("pred.pdf")
 
@@ -206,32 +204,32 @@ if __name__ == "__main__":
         print("Variance = {}".format(np.mean(variance[:, i])))
         plt.figure()
         plt.plot(x0, variance[:, i])
-        plt.title( name_regression[i] +" : Variance")
+        plt.title( name_regression[i] + " : Variance")
         plt.xlabel("x")
         plt.xlim((-9.0, 9.0))
-        plt.savefig(name_regression[i]+" variance.pdf")
+        plt.savefig(name_regression[i]+ " variance.pdf")
 
         print("Bias Squared = {}".format(np.mean(bias_squared[:, i])))
         plt.figure()
         plt.plot(x0, bias_squared[:, i])
-        plt.title( name_regression[i]+" : Squared Bias")
+        plt.title( name_regression[i]+ " : Squared Bias")
         plt.xlabel("x")
         plt.xlim((-9.0, 9.0))
-        plt.savefig(name_regression[i]+" squared_bias.pdf")
+        plt.savefig(name_regression[i]+ " squared_bias.pdf")
 
         print("Total Error = {}".format(np.mean(bias_squared[:, i]) + np.mean(variance[:, i])))
         plt.figure()
         plt.plot(x0, (bias_squared[:, i]+variance[:, i]))
-        plt.title( name_regression[i]+" : Total error")
+        plt.title( name_regression[i]+ " : Total error")
         plt.xlabel("x")
         plt.xlim((-9.0, 9.0))
-        plt.savefig(name_regression[i]+" total_error.pdf")
+        plt.savefig(name_regression[i]+ " total_error.pdf")
 
-    '''
+
 
     #QUESTION 2 D
 
 
-    #plot_var_bias_size_LS(regressors, x0, name_regression)
+    plot_var_bias_size_LS(regressors, x0, name_regression)
 
     plot_var_bias_complexity(x0, n_samples)
