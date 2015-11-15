@@ -68,7 +68,7 @@ def variance_bias(regressors, n_samples, x0, n_fit, noise = 1):
         y = np.zeros((n_samples))
         for i in range (n_samples):
             x[i] = random_state.uniform(low=-9.0, high=9.0)
-            y[i] = make_data(x[i],1,1)
+            y[i] = make_data(x[i],1,noise)
         x = np.array([x]).transpose()
         for j in range(len(regressors)):
             regressors[j].fit(x,y)
@@ -78,8 +78,8 @@ def variance_bias(regressors, n_samples, x0, n_fit, noise = 1):
     for i in range(len(regressors)):    
         bias_squared[i] = (bayes_model(x0)- np.mean(y_estimate[:,i]))**2
         variance[i] = np.var(y_estimate[:,i])
-        print bayes_model(x0)
-        print np.mean(y_estimate[:,i])
+        #print bayes_model(x0)
+        #print np.mean(y_estimate[:,i])
     
     return variance, bias_squared
     
@@ -128,7 +128,7 @@ def plot_var_bias_complexity(x0, n_samples):
     
     for k in range(len(n_neighbors)):
         knn_regressor = KNeighborsRegressor(n_neighbors[k]) 
-        regressors = ([knn_regressor])
+        regressors = [knn_regressor]
         variance = np.zeros(len(x0))
         bias_squared = np.zeros(len(x0))
         for i in range(len(x0)):
@@ -152,7 +152,7 @@ def plot_var_bias_complexity(x0, n_samples):
 
     return variance , bias_squared,mean_var, mean_bias 
     
-def plot_var_bias_over_noise(regressors, x0,name_regression):
+def plot_var_bias_over_noise(regressors, x0, name_regression,n_samples):
     
     noise = [0,0.25,0.50,0.75,1,1.5,2,3]
     
@@ -162,8 +162,8 @@ def plot_var_bias_over_noise(regressors, x0,name_regression):
     
     for n in range(len(noise)):
         print 1
-        variance = np.zeros(len(x0))
-        bias_squared = np.zeros(len(x0))
+        variance = np.zeros((len(x0),len(regressors)))
+        bias_squared = np.zeros((len(x0),len(regressors)))
         for i in range(len(x0)):
             variance[i,:], bias_squared[i,:] = variance_bias(regressors,n_samples, x0[i],50,noise[n])
             
@@ -183,19 +183,28 @@ def plot_var_bias_over_noise(regressors, x0,name_regression):
         plt.legend(loc = "lower center")
         plt.savefig(name_regression[j]+ "change of noise.pdf")
     
+
+def plot_var_bias_over_irrelevant_variables(regressors, x0, name_regression, n_samples):
     
+    
+    
+    n_irrelevant = [1,2,3,5,10]
+    
+    
+    
+
 
 
 
 if __name__ == "__main__":
 
-    x0 = np.linspace(-9.0,9.0,90)
+    x0 = np.linspace(-9.0,9.0,45)
     n_samples = 2000
     
     linear_regression = LinearRegression()
     knn_regressor = KNeighborsRegressor()    
     
-    regressors = ([linear_regression, knn_regressor])
+    regressors = [linear_regression, knn_regressor]
     
     
     
@@ -212,7 +221,7 @@ if __name__ == "__main__":
     
     name_regression = ["Linear regression", "knn regression"]
     
-
+    '''
     variance = np.zeros((len(x0),len(regressors)))
     bias_squared = np.zeros((len(x0),len(regressors)))
     
@@ -222,7 +231,7 @@ if __name__ == "__main__":
     #PLOT
     pred = np.zeros((len(x0),len(regressors)))
     for i in range(len(x0)):
-        for j in range(2):
+        for j in range(len(regressors)):
             pred[i,j] = regressors[j].predict(x0[i])
             
     #Prediction with Linear regression
@@ -273,6 +282,7 @@ if __name__ == "__main__":
         plt.xlim((-9.0, 9.0))
         plt.savefig(name_regression[i]+" total_error.pdf")
 
+    '''
     
     #QUESTION 2 D    
     
@@ -281,7 +291,7 @@ if __name__ == "__main__":
     
     #v, b,mean_var, mean_bias = plot_var_bias_complexity(x0, n_samples)
     
-    #plot_var_bias_over_noise(regressors,x0, name_regression)
+    plot_var_bias_over_noise(regressors,x0, name_regression, n_samples)
     
     
 
