@@ -12,20 +12,19 @@ from sklearn.neighbors import KNeighborsRegressor
 from sklearn.tree import DecisionTreeRegressor
 
 
-
 random_state = get_random_state()
 
-'''
-This function is used to create a sample of data thanks
-to the given function
 
-Input : - x : The input value
-        - n_samples : number of samples made with this input
-        
-Output : - y : The data
-'''
-def make_data(x,n_samples = 1, noise = 1):
+def make_data(x, n_samples = 1, noise = 1):
+    """
+    This function is used to create a sample of data thanks
+    to the given function
 
+    Input : - x : The input value
+            - n_samples : number of samples made with this input
+
+    Output : - y : The data
+    """
     y = np.zeros(n_samples)
 
     for i in range(n_samples):
@@ -34,63 +33,64 @@ def make_data(x,n_samples = 1, noise = 1):
 
     return y
 
-'''
-This function is used to create to bayes model of a given function
 
-Input : - x : The input value
-
-Output : - bayes : Bayes model create from x
-'''
 def bayes_model(x):
-            
-    bayes = (np.sin(x)+ np.cos(x))*x**2
+    """
+    This function is used to create to bayes model of a given function
+
+    Input : - x : The input value
+
+    Output : - bayes : Bayes model create from x
+    """
+    bayes = (np.sin(x)+ np.cos(x)) * (x**2)
 
     return bayes
 
-'''
-This function is used to create the squared bias and the variance at a given
-x0 for given supervised learning algorithm
-
-Input : 
-
-Output : 
-
-'''
-def variance_bias(regressors, n_samples, x0, n_fit, noise = 1):
-        
-    y_estimate = np.zeros((n_fit,len(regressors)))
-    bias_squared = np.zeros(len(regressors))
-    variance = np.zeros(len(regressors))
-    x = np.zeros((n_samples))
-    y = np.zeros((n_samples))
-    for n in range(n_fit):
-        x = np.zeros((n_samples))
-        y = np.zeros((n_samples))
-        for i in range (n_samples):
-            x[i] = random_state.uniform(low=-9.0, high=9.0)
-            y[i] = make_data(x[i],1,1)
-        x = np.array([x]).transpose()
-        for j in range(len(regressors)):
-            regressors[j].fit(x,y)
-            y_estimate[n,j] = regressors[j].predict(x0)
-            
-      
-    for i in range(len(regressors)):    
-        bias_squared[i] = (bayes_model(x0)- np.mean(y_estimate[:,i]))**2
-        variance[i] = np.var(y_estimate[:,i])
-        print bayes_model(x0)
-        print np.mean(y_estimate[:,i])
-    
-    return variance, bias_squared
-    
 
 def residual_error(x0, n_samples):
     y = make_data(x0, n_samples)
     return np.var(y)
-    
+
+
+def variance_bias(regressors, n_samples, x0, n_fit, noise=1):
+    """
+    This function is used to create the squared bias and the variance at a given
+    x0 for given supervised learning algorithm
+
+    Input :
+
+    Output :
+
+    """
+    y_estimate = np.zeros((n_fit, len(regressors)))
+
+    bias_squared = np.zeros(len(regressors))
+    variance = np.zeros(len(regressors))
+
+    for n in range(n_fit):
+        x = np.zeros(n_samples)
+        y = np.zeros(n_samples)
+
+        for i in range(n_samples):
+            x[i] = random_state.uniform(low=-9.0, high=9.0)
+            y[i] = make_data(x[i])
+
+        x = np.array([x]).transpose()
+
+        for n_regressor in range(len(regressors)):
+            regressors[n_regressor].fit(x,y)
+            y_estimate[n, n_regressor] = regressors[n_regressor].predict(x0)
+      
+    for i in range(len(regressors)):    
+        bias_squared[i] = (bayes_model(x0) - np.mean(y_estimate[:, i]))**2
+        variance[i] = np.var(y_estimate[:, i])
+
+    return variance, bias_squared
+
+
 def plot_var_bias_size_LS(regressors, x0,name_regression):
     
-    size_LS = [50, 100, 250, 500,750, 1000, 1500, 2500]
+    size_LS = [50, 100, 250, 500, 750, 1000, 1500, 2500]
     
     mean_var = np.zeros((len(size_LS),len(regressors)))
     mean_bias = np.zeros((len(size_LS),len(regressors)))
@@ -148,11 +148,11 @@ def plot_var_bias_complexity(x0, n_samples):
     plt.xlabel("Number of neighbors")
     plt.legend(loc = "lower center")
     plt.savefig("Change of complexity.pdf")
-    
 
-    return variance , bias_squared,mean_var, mean_bias 
-    
-def plot_var_bias_over_noise(regressors, x0,name_regression):
+    return variance, bias_squared, mean_var, mean_bias
+
+
+def plot_var_bias_over_noise(regressors, x0, name_regression):
     
     noise = [0,0.25,0.50,0.75,1,1.5,2,3]
     
@@ -161,7 +161,6 @@ def plot_var_bias_over_noise(regressors, x0,name_regression):
     error = np.zeros((len(noise),len(regressors)))
     
     for n in range(len(noise)):
-        print 1
         variance = np.zeros(len(x0))
         bias_squared = np.zeros(len(x0))
         for i in range(len(x0)):
@@ -180,98 +179,92 @@ def plot_var_bias_over_noise(regressors, x0,name_regression):
         plt.plot(noise,error[:,j], label="Error")
         plt.title( name_regression[j]+" :Effect of the change of noise")
         plt.xlabel("Size of the LS")
-        plt.legend(loc = "lower center")
+        plt.legend(loc="lower center")
         plt.savefig(name_regression[j]+ "change of noise.pdf")
     
-    
-
-
 
 if __name__ == "__main__":
 
-    x0 = np.linspace(-9.0,9.0,90)
+    x0 = np.linspace(-9.0, 9.0, 300)
     n_samples = 2000
-    
-    linear_regression = LinearRegression()
-    knn_regressor = KNeighborsRegressor()    
-    
-    regressors = ([linear_regression, knn_regressor])
-    
-    
-    
-    
-    #Residual    
-    
+
+    from scipy.stats import describe
+    print("Description of y:")
+    print(describe([make_data(x0[i]) for i in range(len(x0))]))
+
+    regressors = ([LinearRegression(), KNeighborsRegressor()])
+    name_regression = ["Linear", "knn"]
+
+    # Residual error
+    print("Computing the residual error...")
     res_errors = np.zeros(len(x0))
     for i in range(len(x0)):
         res_errors[i] = residual_error(x0[i], n_samples)
 
-    
+    print("Residual error : {}".format(np.mean(res_errors)))
 
-    #Variance and Squared bias    
-    
-    name_regression = ["Linear regression", "knn regression"]
-    
+    plt.figure()
+    plt.scatter(x0, res_errors)
+    plt.title("Residual errors")
+    plt.xlabel("x")
+    plt.xlim((-9.0, 9.0))
+    plt.ylabel("Residual error")
+    plt.ylim((0.7, 1.3))
+    plt.savefig("Residual_errors.pdf")
 
-    variance = np.zeros((len(x0),len(regressors)))
-    bias_squared = np.zeros((len(x0),len(regressors)))
-    
+    # Variance and Squared bias
+    print("Computing the variance and the squared bias...")
+    variance = np.zeros((len(x0), len(regressors)))
+    bias_squared = np.zeros((len(x0), len(regressors)))
+
     for i in range(len(x0)):
-        variance[i,:], bias_squared[i,:] = variance_bias(regressors,n_samples, x0[i],500)
+        variance[i,:], bias_squared[i, :] = variance_bias(regressors, n_samples, x0[i], 500)
     
-    #PLOT
+    # PLOT
     pred = np.zeros((len(x0),len(regressors)))
     for i in range(len(x0)):
         for j in range(2):
             pred[i,j] = regressors[j].predict(x0[i])
             
-    #Prediction with Linear regression
-    
+    # Prediction with Linear regression
+    print("Plotting the values of the function and the predictions...")
     plt.figure()
-    plt.plot(x0, (np.sin(x0)+ np.cos(x0))*x0**2, linewidth = 2.0, label="Real function")
-    plt.plot(x0, pred[:,0], label = "Linear prediction") 
-    plt.plot(x0, pred[:,1], label = "knn prediction")
-    plt.title( "Prediction against real function")
+    plt.plot(x0, bayes_model(x0), linewidth=2.0, label="Real function")
+    plt.plot(x0, pred[:,0], label="Linear prediction")
+    plt.plot(x0, pred[:,1], label="knn prediction")
+    plt.title("Prediction against real function")
     plt.xlabel("x")
-    plt.legend(loc = "upper center")
+    plt.legend(loc="upper center")
     plt.xlim((-9.0, 9.0))
     plt.savefig("pred.pdf")
 
-    
-    
-    print("Residual error : {}".format(np.mean(res_errors)))
-    
-    plt.figure()
-    plt.plot(x0, res_errors)
-    plt.title( "Residual errors")
-    plt.xlabel("x")
-    plt.xlim((-9.0, 9.0))
-    plt.savefig("Residual_errors.pdf")
-    
-    
+    print("Plotting the variance and the squared bias...")
     for i in range(2):
-        print(name_regression[i])
-        print("Variance = {}".format(np.mean(variance[:,i])))
+        print("--> {}".format(name_regression[i]))
+
+        print("Variance = {}".format(np.mean(variance[:, i])))
         plt.figure()
         plt.plot(x0, variance[:,i])
-        plt.title( name_regression[i] +" : Variance")
+        plt.title(name_regression[i] + " : Variance")
         plt.xlabel("x")
         plt.xlim((-9.0, 9.0))
-        plt.savefig(name_regression[i]+" variance.pdf")
+        plt.savefig(name_regression[i] + "_variance.pdf")
+
         print("Bias Squared = {}".format(np.mean(bias_squared[:,i])))
         plt.figure()
         plt.plot(x0, bias_squared[:,i])
-        plt.title( name_regression[i]+" : Squared Bias")
+        plt.title(name_regression[i] + " : Squared Bias")
         plt.xlabel("x")
         plt.xlim((-9.0, 9.0))
-        plt.savefig(name_regression[i]+" squared_bias.pdf")
-        print("Total Error = {}".format(np.mean(bias_squared[:,i])+ np.mean(variance[:,i])))
+        plt.savefig(name_regression[i] + "_squared_bias.pdf")
+
+        print("Total Error = {}".format(np.mean(bias_squared[:,i]) + np.mean(variance[:,i])))
         plt.figure()
-        plt.plot(x0, (bias_squared[:,i]+variance[:,i]))
-        plt.title( name_regression[i]+" : Total error")
+        plt.plot(x0, (bias_squared[:, i]+variance[:, i]))
+        plt.title(name_regression[i] + " : Total error")
         plt.xlabel("x")
         plt.xlim((-9.0, 9.0))
-        plt.savefig(name_regression[i]+" total_error.pdf")
+        plt.savefig(name_regression[i] + "_total_error.pdf")
 
     
     #QUESTION 2 D    
