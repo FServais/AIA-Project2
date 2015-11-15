@@ -68,7 +68,7 @@ def variance_bias(regressors, n_samples, x0, n_fit, noise = 1):
         y = np.zeros((n_samples))
         for i in range (n_samples):
             x[i] = random_state.uniform(low=-9.0, high=9.0)
-            y[i] = make_data(x[i],noise)
+            y[i] = make_data(x[i],1,1)
         x = np.array([x]).transpose()
         for j in range(len(regressors)):
             regressors[j].fit(x,y)
@@ -92,13 +92,13 @@ def plot_var_bias_size_LS(regressors, x0,name_regression):
     
     size_LS = [50, 100, 250, 500,750, 1000, 1500, 2500]
     
-    mean_var = np.zeros((len(size_LS),2))
-    mean_bias = np.zeros((len(size_LS),2))
-    error = np.zeros((len(size_LS),2))
+    mean_var = np.zeros((len(size_LS),len(regressors)))
+    mean_bias = np.zeros((len(size_LS),len(regressors)))
+    error = np.zeros((len(size_LS),len(regressors)))
     
     for s in range(len(size_LS)):
-        variance = np.zeros((len(x0),2))
-        bias_squared = np.zeros((len(x0),2))
+        variance = np.zeros((len(x0),len(regressors)))
+        bias_squared = np.zeros((len(x0),len(regressors)))
         for i in range(len(x0)):
             variance[i,:], bias_squared[i,:] = variance_bias(regressors,size_LS[s], x0[i],500)
         
@@ -120,20 +120,19 @@ def plot_var_bias_size_LS(regressors, x0,name_regression):
 
 def plot_var_bias_complexity(x0, n_samples):
     
-    n_neighbors = [1,2, 3,4, 5 ,7, 10, 15, 25]#, 1000,1500, 2000]
+    n_neighbors = [1,2, 3,4, 5 ,7, 10, 15, 25,100] #
     
     mean_var = np.zeros(len(n_neighbors))
     mean_bias = np.zeros(len(n_neighbors))
     error = np.zeros(len(n_neighbors))    
     
     for k in range(len(n_neighbors)):
-        print 1
         knn_regressor = KNeighborsRegressor(n_neighbors[k]) 
         regressors = ([knn_regressor])
         variance = np.zeros(len(x0))
         bias_squared = np.zeros(len(x0))
         for i in range(len(x0)):
-            variance[i], bias_squared[i] = variance_bias(regressors,n_samples, x0[i],50)
+            variance[i], bias_squared[i] = variance_bias(regressors,n_samples, x0[i],500)
         
     
         mean_var[k] = np.mean(variance)
@@ -151,20 +150,55 @@ def plot_var_bias_complexity(x0, n_samples):
     plt.savefig("Change of complexity.pdf")
     
 
-    return variance , bias_squared,mean_var, mean_bias    
+    return variance , bias_squared,mean_var, mean_bias 
+    
+def plot_var_bias_over_noise(regressors, x0,name_regression):
+    
+    noise = [0,0.25,0.50,0.75,1,1.5,2,3]
+    
+    mean_var = np.zeros((len(noise),len(regressors)))
+    mean_bias = np.zeros((len(noise),len(regressors)))
+    error = np.zeros((len(noise),len(regressors)))
+    
+    for n in range(len(noise)):
+        print 1
+        variance = np.zeros(len(x0))
+        bias_squared = np.zeros(len(x0))
+        for i in range(len(x0)):
+            variance[i,:], bias_squared[i,:] = variance_bias(regressors,n_samples, x0[i],50,noise[n])
+            
+        for j in range(len(regressors)):
+            mean_var[n,j] = np.mean(variance[:,j])
+            mean_bias[n,j] = np.mean(bias_squared[:,j])
+            error[n,j] = mean_var[n,j] + mean_bias[n,j]
+
+            
+    for j in range(len(regressors)):     
+        plt.figure()
+        plt.plot(noise,mean_var[:,j], label="Mean variance")
+        plt.plot(noise,mean_bias[:,j], label="Mean squared bias")
+        plt.plot(noise,error[:,j], label="Error")
+        plt.title( name_regression[j]+" :Effect of the change of noise")
+        plt.xlabel("Size of the LS")
+        plt.legend(loc = "lower center")
+        plt.savefig(name_regression[j]+ "change of noise.pdf")
+    
     
 
 
 
 if __name__ == "__main__":
 
-    x0 = np.linspace(-9.0,9.0,45)
-    n_samples = 500
+    x0 = np.linspace(-9.0,9.0,90)
+    n_samples = 2000
     
     linear_regression = LinearRegression()
     knn_regressor = KNeighborsRegressor()    
     
     regressors = ([linear_regression, knn_regressor])
+    
+    
+    
     
     #Residual    
     
@@ -178,15 +212,15 @@ if __name__ == "__main__":
     
     name_regression = ["Linear regression", "knn regression"]
     
-     
-    variance = np.zeros((len(x0),2))
-    bias_squared = np.zeros((len(x0),2))
+
+    variance = np.zeros((len(x0),len(regressors)))
+    bias_squared = np.zeros((len(x0),len(regressors)))
     
     for i in range(len(x0)):
-        variance[i,:], bias_squared[i,:] = variance_bias(regressors,n_samples, x0[i],250)
+        variance[i,:], bias_squared[i,:] = variance_bias(regressors,n_samples, x0[i],500)
     
     #PLOT
-    pred = np.zeros((len(x0),2))
+    pred = np.zeros((len(x0),len(regressors)))
     for i in range(len(x0)):
         for j in range(2):
             pred[i,j] = regressors[j].predict(x0[i])
@@ -238,7 +272,7 @@ if __name__ == "__main__":
         plt.xlabel("x")
         plt.xlim((-9.0, 9.0))
         plt.savefig(name_regression[i]+" total_error.pdf")
-    
+
     
     #QUESTION 2 D    
     
@@ -246,6 +280,8 @@ if __name__ == "__main__":
     #plot_var_bias_size_LS(regressors, x0, name_regression)
     
     #v, b,mean_var, mean_bias = plot_var_bias_complexity(x0, n_samples)
+    
+    #plot_var_bias_over_noise(regressors,x0, name_regression)
     
     
 
