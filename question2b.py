@@ -137,13 +137,11 @@ def plot_var_bias_size_LS(regressors, x0,name_regression):
         plt.legend(loc = "upper right")
         plt.savefig(name_regression[j]+ "change of LS.pdf")
         
-    return mean_var,mean_bias, variance
+
         
 
 def plot_var_bias_complexity(x0, n_samples,name_regression):
     
-    #n_neighbors = [1,2, 3,4, 5 ,7, 10, 15, 30] #
-    #n_iter = [1,2,3,4,5,7,10,15,30]
     
     parameters =np.array([[5,25,75,150,250,500,1000,1500,2000],[1,2, 3,4, 5 ,7, 10, 15, 30]])
     
@@ -164,9 +162,7 @@ def plot_var_bias_complexity(x0, n_samples,name_regression):
         variance = np.zeros((len(x0),len(regressors)))
         bias_squared = np.zeros((len(x0),len(regressors)))
         for i in range(len(x0)):
-            variance[i,:], bias_squared[i,:] = variance_bias(regressors,n_samples, x0[i],5)
-            print variance
-            print bias_squared
+            variance[i,:], bias_squared[i,:] = variance_bias(regressors,n_samples, x0[i],50)
         for j in range(len(regressors)):
             mean_var[k,j] = np.mean(variance[:,j])
             mean_bias[k,j] = np.mean(bias_squared[:,j])
@@ -185,14 +181,15 @@ def plot_var_bias_complexity(x0, n_samples,name_regression):
         
     plt.figure()
     plt.plot(parameters[0,:], mean_var[:,0])
-    
-    return mean_var
+    plt.xlabel(xlabel[0])
+    plt.title(name_regression[0]+" : Mean variance")
+    plt.savefig(name_regression[0]+"Variance.pdf")
     
      
     
 def plot_var_bias_over_noise(regressors, x0, name_regression,n_samples):
     
-    noise = [0.1,0.25,0.50,0.75,1,1.5,2,3,5]
+    noise = [0.1,0.25,0.50,0.75,1,1.5,2,3,5,10,20]
     
     mean_var = np.zeros((len(noise),len(regressors)))
     mean_bias = np.zeros((len(noise),len(regressors)))
@@ -203,7 +200,7 @@ def plot_var_bias_over_noise(regressors, x0, name_regression,n_samples):
         variance = np.zeros((len(x0),len(regressors)))
         bias_squared = np.zeros((len(x0),len(regressors)))
         for i in range(len(x0)):
-            variance[i,:], bias_squared[i,:] = variance_bias(regressors,n_samples, x0[i],50,noise[n])
+            variance[i,:], bias_squared[i,:] = variance_bias(regressors,n_samples, x0[i],100,noise[n])
             
         for j in range(len(regressors)):
             mean_var[n,j] = np.mean(variance[:,j])
@@ -221,6 +218,12 @@ def plot_var_bias_over_noise(regressors, x0, name_regression,n_samples):
         plt.xlabel("Variance of the noise")
         plt.legend(loc = "center left")
         plt.savefig(name_regression[j]+ "change of noise.pdf")
+        
+    plt.figure()
+    plt.plot(noise, mean_var[:,0])
+    plt.xlabel("Variance of the noise")
+    plt.title(name_regression[0]+" : Mean variance")
+    plt.savefig(name_regression[0]+"Variance_noise.pdf")
     
 
 def plot_var_bias_over_irrelevant_variables(regressors, x0, name_regression, n_samples):
@@ -355,11 +358,11 @@ if __name__ == "__main__":
     #QUESTION 2 D    
     
     
-    #a,b,c = plot_var_bias_size_LS(regressors, x0, name_regression)
+    #plot_var_bias_size_LS(regressors, x0, name_regression)
     #print 2
-    a =plot_var_bias_complexity(x0, n_samples,name_regression)
+    #plot_var_bias_complexity(x0, n_samples,name_regression)
     #print 2
-    #plot_var_bias_over_noise(regressors,x0, name_regression, n_samples)
+    plot_var_bias_over_noise(regressors,x0, name_regression, n_samples)
     #print 2
     #plot_var_bias_over_irrelevant_variables(regressors, x0, name_regression, n_samples)
     '''
