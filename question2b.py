@@ -9,7 +9,7 @@ from matplotlib import pyplot as plt
 from utils import get_random_state
 from sklearn.linear_model import LinearRegression
 from sklearn.neighbors import KNeighborsRegressor
-from sklearn.linear_model import SGDRegressor
+from sklearn.linear_model import Ridge
 
 
 
@@ -61,13 +61,15 @@ def variance_bias(regressors, n_samples, x0, n_fit, noise = 1, nb_irrelevant = 0
     y_estimate = np.zeros((n_fit,len(regressors)))
     bias_squared = np.zeros(len(regressors))
     variance = np.zeros(len(regressors))
-    #if nb_irrelevant != 0:
-    #   x0_extended = np.ones(nb_irrelevant+1)*x0
+    if nb_irrelevant != 0:
+        x0_extended = np.zeros(nb_irrelevant+1)
+        x0_extended[0] = x0
+        for t in range(1,nb_irrelevant+1):
+            x0_extended[t] = random_state.uniform(low=-9.0, high=9.0)
 
     
     for n in range(n_fit):
         if nb_irrelevant == 0:
-            #print 5
             x = np.zeros((n_samples))
             y = np.zeros((n_samples))
             for i in range (n_samples):
@@ -76,21 +78,18 @@ def variance_bias(regressors, n_samples, x0, n_fit, noise = 1, nb_irrelevant = 0
             x = np.array([x]).transpose()
             for j in range(len(regressors)):
                 regressors[j].fit(x,y)
-                y_estimate[n,j] = regressors[j].predict(x0)
-        '''        
+                y_estimate[n,j] = regressors[j].predict(x0)      
         else:
-            print 6
             X = np.zeros((n_samples,nb_irrelevant+1))
-            y = np.zeros((n_samples,nb_irrelevant+1))
+            y = np.zeros(n_samples)
             for i in range(n_samples):
                 for r in range(nb_irrelevant+1):
                     X[i,r] = random_state.uniform(low=-9.0, high=9.0)
                     y[i] = make_data(X[i,0],1,noise)
             for j in range(len(regressors)):
                 regressors[j].fit(X,y)
-                print regressors[j].predict(x0_extended)
                 y_estimate[n,j] = regressors[j].predict(x0_extended)
-        '''
+        
     for i in range(len(regressors)):    
         bias_squared[i] = (bayes_model(x0)- np.mean(y_estimate[:,i]))**2
         variance[i] = np.var(y_estimate[:,i])
@@ -106,7 +105,7 @@ def residual_error(x0, n_samples):
     
 def plot_var_bias_size_LS(regressors, x0,name_regression):
     
-    size_LS = [5,25,50,75, 100, 250, 500,750, 1000]# 1500, 2500]
+    size_LS = [5,25,50,75, 100, 250, 500,750, 1000]
     
     mean_var = np.zeros((len(size_LS),len(regressors)))
     mean_bias = np.zeros((len(size_LS),len(regressors)))
@@ -114,11 +113,10 @@ def plot_var_bias_size_LS(regressors, x0,name_regression):
     error = np.zeros((len(size_LS),len(regressors)))
     
     for s in range(len(size_LS)):
-        print 1
         variance = np.zeros((len(x0),len(regressors)))
         bias_squared = np.zeros((len(x0),len(regressors)))
         for i in range(len(x0)):
-            variance[i,:], bias_squared[i,:] = variance_bias(regressors,size_LS[s], x0[i],10)
+            variance[i,:], bias_squared[i,:] = variance_bias(regressors,size_LS[s], x0[i],50)
         
         for j in range(len(regressors)):
             mean_var[s,j] = np.mean(variance[:,j])
@@ -143,11 +141,11 @@ def plot_var_bias_size_LS(regressors, x0,name_regression):
 def plot_var_bias_complexity(x0, n_samples,name_regression):
     
     
-    parameters =np.array([[5,25,75,150,250,500,1000,1500,2000],[1,2, 3,4, 5 ,7, 10, 15, 30]])
+    parameters =np.array([[5,1000,2500,5000,10000,25000,50000,100000,250000],[1,2, 3,4, 5 ,7, 10, 15, 30]])
     
-    xlabel = ["Number of iterations", "Number of neighbors"]    
+    xlabel = ["Value of alpha", "Number of neighbors"]    
     
-    name_regression[0] ="SGD regression"
+    name_regression[0] ="Ridge regression"
     
     mean_var = np.zeros((np.shape(parameters)[1],2))
     mean_bias = np.zeros((np.shape(parameters)[1],2))
@@ -157,8 +155,8 @@ def plot_var_bias_complexity(x0, n_samples,name_regression):
     for k in range(np.shape(parameters)[1]):
         print 1
         knn_regressor = KNeighborsRegressor(parameters[1,k])
-        SGD_regressor = SGDRegressor(n_iter = parameters[0,k])
-        regressors = [SGD_regressor,knn_regressor]
+        Ridge_regressor = Ridge(alpha = parameters[0,k])
+        regressors = [Ridge_regressor,knn_regressor]
         variance = np.zeros((len(x0),len(regressors)))
         bias_squared = np.zeros((len(x0),len(regressors)))
         for i in range(len(x0)):
@@ -176,15 +174,15 @@ def plot_var_bias_complexity(x0, n_samples,name_regression):
         plt.plot(parameters[j,:],error[:,j], label="Error")
         plt.title(name_regression[j]+" :Effect of the change of complexity")
         plt.xlabel(xlabel[j])
-        plt.legend(loc = "upper center")
+        plt.legend(loc = "center right")
         plt.savefig(name_regression[j]+"Change of complexity.pdf")
-        
+    '''    
     plt.figure()
     plt.plot(parameters[0,:], mean_var[:,0])
     plt.xlabel(xlabel[0])
     plt.title(name_regression[0]+" : Mean variance")
     plt.savefig(name_regression[0]+"Variance.pdf")
-    
+    '''
      
     
 def plot_var_bias_over_noise(regressors, x0, name_regression,n_samples):
@@ -196,11 +194,10 @@ def plot_var_bias_over_noise(regressors, x0, name_regression,n_samples):
     error = np.zeros((len(noise),len(regressors)))
     
     for n in range(len(noise)):
-        print 1
         variance = np.zeros((len(x0),len(regressors)))
         bias_squared = np.zeros((len(x0),len(regressors)))
         for i in range(len(x0)):
-            variance[i,:], bias_squared[i,:] = variance_bias(regressors,n_samples, x0[i],100,noise[n])
+            variance[i,:], bias_squared[i,:] = variance_bias(regressors,n_samples, x0[i],50,noise[n])
             
         for j in range(len(regressors)):
             mean_var[n,j] = np.mean(variance[:,j])
@@ -230,7 +227,7 @@ def plot_var_bias_over_irrelevant_variables(regressors, x0, name_regression, n_s
     
     
     
-    nb_irrelevant = [2]
+    nb_irrelevant = [1,2,5,7,10,15,30]
     
     mean_var = np.zeros((len(nb_irrelevant),len(regressors)))
     mean_bias = np.zeros((len(nb_irrelevant),len(regressors)))
@@ -241,8 +238,7 @@ def plot_var_bias_over_irrelevant_variables(regressors, x0, name_regression, n_s
         variance = np.zeros((len(x0),len(regressors)))
         bias_squared = np.zeros((len(x0),len(regressors)))
         for i in range(len(x0)):
-            variance[i,:], bias_squared[i,:] = variance_bias(regressors,n_samples, x0[i],50,1,nb_irrelevant[i])
-            
+            variance[i,:], bias_squared[i,:] =  variance_bias(regressors,n_samples, x0[i],50,1,nb_irrelevant[n])
         for j in range(len(regressors)):
             mean_var[n,j] = np.mean(variance[:,j])
             mean_bias[n,j] = np.mean(bias_squared[:,j])
@@ -251,12 +247,12 @@ def plot_var_bias_over_irrelevant_variables(regressors, x0, name_regression, n_s
             
     for j in range(len(regressors)):     
         plt.figure()
-        plt.plot(noise,mean_var[:,j], label="Mean variance")
-        plt.plot(noise,mean_bias[:,j], label="Mean squared bias")
-        plt.plot(noise,error[:,j], label="Error")
+        plt.plot(nb_irrelevant,mean_var[:,j], label="Mean variance")
+        plt.plot(nb_irrelevant,mean_bias[:,j], label="Mean squared bias")
+        plt.plot(nb_irrelevant,error[:,j], label="Error")
         plt.title( name_regression[j]+" :Effect of the addition of irrelevant variables")
         plt.xlabel("Number of irrelevant variables")
-        plt.legend(loc = "lower center")
+        plt.legend(loc = "center right")
         plt.savefig(name_regression[j]+ "with irrelevant variables.pdf")
     
     
@@ -360,9 +356,9 @@ if __name__ == "__main__":
     
     #plot_var_bias_size_LS(regressors, x0, name_regression)
     #print 2
-    #plot_var_bias_complexity(x0, n_samples,name_regression)
+    plot_var_bias_complexity(x0, n_samples,name_regression)
     #print 2
-    plot_var_bias_over_noise(regressors,x0, name_regression, n_samples)
+    #plot_var_bias_over_noise(regressors,x0, name_regression, n_samples)
     #print 2
     #plot_var_bias_over_irrelevant_variables(regressors, x0, name_regression, n_samples)
     '''
@@ -387,27 +383,31 @@ if __name__ == "__main__":
                 y[i] = make_data(x[i],1,noise)
             x = np.array([x]).transpose()
             for j in range(len(regressors)):
+                
                 regressors[j].fit(x,y)
                 y_estimate[n,j] = regressors[j].predict(x0)
         else:
             X = np.zeros((n_samples,nb_irrelevant+1))
-            y = np.zeros((n_samples,nb_irrelevant+1))
-            for i in range(n_samples):
-                for r in range(nb_irrelevant+1):
+            y = np.zeros(n_samples)
+            
+            for r in range(nb_irrelevant+1):
+                for i in range(n_samples):
                     X[i,r] = random_state.uniform(low=-9.0, high=9.0)
-                    y[i] = make_data(X[i,0],1,noise)
+                    y[i] = make_data(X[i,0])
+                
+                
+                    
             for j in range(len(regressors)):
                 regressors[j].fit(X,y)
-                print regressors[j].predict(x0_extended)
-                #y_estimate[n,j] = regressors[j].predict(x0_extended)
+                #print regressors[j].predict(x0_extended)
+                y_estimate[n,j] = regressors[j].predict(x0_extended)
       
     #for i in range(len(regressors)):    
     #    bias_squared[i] = (bayes_model(x0)- np.mean(y_estimate[:,i]))**2
     #    variance[i] = np.var(y_estimate[:,i])
 
     
-    '''
-          
+    '''    
         
         
         
