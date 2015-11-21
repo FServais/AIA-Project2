@@ -15,6 +15,20 @@ from sklearn.linear_model import Ridge
 
 random_state = get_random_state()
 
+def tic():
+    #Homemade version of matlab tic and toc functions
+    import time
+    global startTime_for_tictoc
+    startTime_for_tictoc = time.time()
+
+def toc():
+    import time
+    if 'startTime_for_tictoc' in globals():
+        print "Elapsed time is " + str(time.time() - startTime_for_tictoc) + " seconds."
+    else:
+        print "Toc: start time not set"
+
+
 '''
 This function is used to create a sample of data thanks
 to the given function
@@ -137,7 +151,7 @@ def plot_var_bias_size_LS(regressors, x0,name_regression):
         variance = np.zeros((len(x0),len(regressors)))
         bias_squared = np.zeros((len(x0),len(regressors)))
         for i in range(len(x0)):
-            variance[i,:], bias_squared[i,:] = variance_bias(regressors,size_LS[s], x0[i],50)
+            variance[i,:], bias_squared[i,:] = variance_bias(regressors,size_LS[s], x0[i],10)
         
         for j in range(len(regressors)):
             mean_var[s,j] = np.mean(variance[:,j])
@@ -188,7 +202,7 @@ def plot_var_bias_complexity(x0, n_samples,name_regression):
         variance = np.zeros((len(x0),len(regressors)))
         bias_squared = np.zeros((len(x0),len(regressors)))
         for i in range(len(x0)):
-            variance[i,:], bias_squared[i,:] = variance_bias(regressors,n_samples, x0[i],50)
+            variance[i,:], bias_squared[i,:] = variance_bias(regressors,n_samples, x0[i],10)
         for j in range(len(regressors)):
             mean_var[k,j] = np.mean(variance[:,j])
             mean_bias[k,j] = np.mean(bias_squared[:,j])
@@ -227,7 +241,7 @@ def plot_var_bias_over_noise(regressors, x0, name_regression,n_samples):
         variance = np.zeros((len(x0),len(regressors)))
         bias_squared = np.zeros((len(x0),len(regressors)))
         for i in range(len(x0)):
-            variance[i,:], bias_squared[i,:] = variance_bias(regressors,n_samples, x0[i],50,noise[n])
+            variance[i,:], bias_squared[i,:] = variance_bias(regressors,n_samples, x0[i],10,noise[n])
             
         for j in range(len(regressors)):
             mean_var[n,j] = np.mean(variance[:,j])
@@ -278,7 +292,7 @@ def plot_var_bias_over_irrelevant_variables(regressors, x0, name_regression, n_s
         variance = np.zeros((len(x0),len(regressors)))
         bias_squared = np.zeros((len(x0),len(regressors)))
         for i in range(len(x0)):
-            variance[i,:], bias_squared[i,:] =  variance_bias(regressors,n_samples, x0[i],50,1,nb_irrelevant[n])
+            variance[i,:], bias_squared[i,:] =  variance_bias(regressors,n_samples, x0[i],10,1,nb_irrelevant[n])
         for j in range(len(regressors)):
             mean_var[n,j] = np.mean(variance[:,j])
             mean_bias[n,j] = np.mean(bias_squared[:,j])
@@ -302,9 +316,9 @@ def plot_var_bias_over_irrelevant_variables(regressors, x0, name_regression, n_s
 
 
 if __name__ == "__main__":
-
+    tic()
     x0 = np.linspace(-9.0,9.0,90)
-    n_samples = 1000
+    n_samples = 750
     
     linear_regression = LinearRegression()
     knn_regressor = KNeighborsRegressor()    
@@ -331,7 +345,7 @@ if __name__ == "__main__":
     bias_squared = np.zeros((len(x0),len(regressors)))
     
     for i in range(len(x0)):
-        variance[i,:], bias_squared[i,:] = variance_bias(regressors,n_samples, x0[i],500)
+        variance[i,:], bias_squared[i,:] = variance_bias(regressors,n_samples, x0[i],10)
     
     #PLOT
     pred = np.zeros((len(x0),len(regressors)))
@@ -388,16 +402,19 @@ if __name__ == "__main__":
         plt.xlim((-9.0, 9.0))
         plt.savefig(name_regression[i]+" total_error.pdf")
 
-    
+    print 2
     #QUESTION 2 D    
     
     
     plot_var_bias_size_LS(regressors, x0, name_regression)
+    print 2
     plot_var_bias_complexity(x0, n_samples,name_regression)
+    print 2
     plot_var_bias_over_noise(regressors,x0, name_regression, n_samples)
+    print 2
     plot_var_bias_over_irrelevant_variables(regressors, x0, name_regression, n_samples)
         
-        
+    toc()   
         
         
         
