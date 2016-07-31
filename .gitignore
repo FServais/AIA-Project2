@@ -20,3 +20,13 @@ Linear_squared_bias.pdf
 Linear_total_error.pdf
 Linear_variance.pdf
 pred.pdf
+knn regressionChange of complexity.pdf
+knn regressionchange of LS.pdf
+knn regressionchange of noise.pdf
+knn regressionwith irrelevant variables.pdf
+Linear regressionchange of LS.pdf
+Ridge regressionChange of complexity.pdf
+Ridge regressionchange of noise.pdf
+Ridge regressionVariance_noise.pdf
+Ridge regressionwith irrelevant variables.pdf
+__pycache__/generate_data_bayes.cpython-34.pyc
